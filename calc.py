@@ -1,4 +1,5 @@
-#https://github.com/HorvathhMilanAlex/Calculator.git
+#https://github.com/HorvathhMilanAlex/Calculator
+#Credits: Poo_a_panda, No AI used.
 
 import tkinter as tk
 """
@@ -10,85 +11,119 @@ labamalol.pop(szék)
 
 """
 #Számoló fuggvenyek
-ops = ["^","√","×","/","+","-"]
+ops = ["^","√","×","/","+","-"] 
+errors = ["Syntax error","Mathematical error"]
 
 def Count(lon):
+    for error in errors:
+        if error in lon or lon == "": return ""
+    
     terms = []
     sequence = ""
-    sq_n = None
+    
     for each in lon:
         if each not in ops:
             sequence += each
-            
+        
+        elif each == "√" and sequence == "":
+            terms.append(2.0)
+            terms.append(each)
+        
         else:           
             if sequence == "":
                 return "Syntax error"
-            
-            if each == "√" and terms[-1] in ops:
-                sq_n == 2
-                
+
             terms.append(float(sequence))
             
-            #Gyök
-            if sq_n != None:
-                terms.append("×")
-                terms.append(sq_n)
-                sq_n = None
-                
             terms.append(each)       
             sequence = ""
     
     if sequence != "":
         terms.append(float(sequence))
     
+    #Operator végződes
     if terms[-1] in ops:
         return "Syntax error"
     
+    #Dupla pont észlelés
+    for i in terms:
+        dots = 0
+        for j in str(i):
+            if "." == j:
+                dots += 1
+        if dots == 2: 
+            return "Syntax error"
+    print(terms)
     i = 0
+    can_pass = False
     while(len(terms) != 1):
-        i += 1
-        if terms[i] == "^":
+        try:
+            i = terms.index("^")
             terms[i] = terms[i-1]**terms[i+1]
             terms.pop(i+1),terms.pop(i-1)
-            i = 0
-        elif terms[i] == "√":
+            i = 0           
+        except:
+            pass
+        
+        try:
+            i = terms.index("√")
             terms[i] = terms[i+1]**(1/terms[i-1])
             terms.pop(i+1),terms.pop(i-1)
             i = 0
-        elif terms[i] == "×":
+        except:
+            pass
+        
+        try:
+            i = terms.index("×")
             terms[i] = terms[i-1]*terms[i+1]
             terms.pop(i+1),terms.pop(i-1)
             i = 0
-        elif terms[i] == "/":
+        except:
+            pass
+        
+        try:
+            i = terms.index("/")
             try:
                 terms[i] = terms[i-1]/terms[i+1]
                 terms.pop(i+1),terms.pop(i-1)
                 i = 0
+            # 0-val való osztás
             except:
                 return "Mathematical error"
-        elif terms[i] == "+":
+        except:
+            pass
+        
+        try:
+            i = terms.index("+")
             terms[i] = terms[i-1]+terms[i+1]
             terms.pop(i+1),terms.pop(i-1)
             i = 0
-        elif terms[i] == "-":
+        except:
+            pass
+        
+        try:
+            i = terms.index("-")
             terms[i] = terms[i-1]-terms[i+1]
             terms.pop(i+1),terms.pop(i-1)
             i = 0
+        except:
+            pass
 
     return ''.join(str(term) for term in terms)
 
 #Logaritmus
 def logarithm(base,arg,exp):
-    if "yy" in base+arg+exp:
+    if "yy" in base+arg+exp or ops in base+arg+exp:
         return "Syntax error"
     
     if base == "y":
-        pass
+        return arg**(1/exp)
     
     elif arg == "y":
-        pass
+        return base**exp
     
     elif exp == "y":
+        #Matek fuzetbe van egy otlet - glhf
         pass
     
     else:
@@ -104,11 +139,6 @@ window.geometry("300x400")
 mp_text = ""
 main_panel = tk.Label(window, text=mp_text, font="Arial")
 main_panel.grid(column=0,columnspan=10,row=0,sticky="nw")
-
-#Grid - glhf
-
-
-
 
 #Gombok
 
