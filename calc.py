@@ -13,11 +13,9 @@ labamalol.pop(szék)
 #Számoló fuggvenyek
 ops = ["^","√","×","/","+","-"] 
 errors = ["Syntax error","Mathematical error"]
-
-def Count(lon):
+def Tokenize(lon):
     for error in errors:
         if error in lon or lon == "": return ""
-    
     terms = []
     sequence = ""
     
@@ -41,6 +39,7 @@ def Count(lon):
     if sequence != "":
         terms.append(float(sequence))
     
+    
     #Operator végződes
     if terms[-1] in ops:
         return "Syntax error"
@@ -53,62 +52,70 @@ def Count(lon):
                 dots += 1
         if dots == 2: 
             return "Syntax error"
-    print(terms)
-    i = 0
-    can_pass = False
-    while(len(terms) != 1):
+    return terms
+    
+def Count(terms):
+    
+    try:
+        i = terms.index("^")
+        terms[i] = terms[i-1]**terms[i+1]
+        terms.pop(i+1),terms.pop(i-1)
+        return terms        
+    except:
+        pass
+    
+    try:
+        i = terms.index("√")
+        terms[i] = terms[i+1]**(1/terms[i-1])
+        terms.pop(i+1),terms.pop(i-1)
+        return terms 
+    except:
+        pass
+    
+    try:
+        i = terms.index("×")
+        terms[i] = terms[i-1]*terms[i+1]
+        terms.pop(i+1),terms.pop(i-1)
+        return terms
+    except:
+        pass
+    
+    try:
+        i = terms.index("/")
         try:
-            i = terms.index("^")
-            terms[i] = terms[i-1]**terms[i+1]
+            terms[i] = terms[i-1]/terms[i+1]
             terms.pop(i+1),terms.pop(i-1)
-            i = 0           
+            return terms
+        # 0-val való osztás
         except:
-            pass
+            return "Mathematical error"
+    except:
+        pass
+    
+    try:
+        i = terms.index("+")
+        terms[i] = terms[i-1]+terms[i+1]
+        terms.pop(i+1),terms.pop(i-1)
+        return terms
+    except:
+        pass
+    
+    try:
+        i = terms.index("-")
+        terms[i] = terms[i-1]-terms[i+1]
+        terms.pop(i+1),terms.pop(i-1)
+        return terms
+    except:
+        pass
+    return terms
+    
+def Get_Result(lon):
+    terms = Tokenize(lon)
+    
+    while (len(terms) != 1):
+        terms = Count(terms)
+        print(terms)
         
-        try:
-            i = terms.index("√")
-            terms[i] = terms[i+1]**(1/terms[i-1])
-            terms.pop(i+1),terms.pop(i-1)
-            i = 0
-        except:
-            pass
-        
-        try:
-            i = terms.index("×")
-            terms[i] = terms[i-1]*terms[i+1]
-            terms.pop(i+1),terms.pop(i-1)
-            i = 0
-        except:
-            pass
-        
-        try:
-            i = terms.index("/")
-            try:
-                terms[i] = terms[i-1]/terms[i+1]
-                terms.pop(i+1),terms.pop(i-1)
-                i = 0
-            # 0-val való osztás
-            except:
-                return "Mathematical error"
-        except:
-            pass
-        
-        try:
-            i = terms.index("+")
-            terms[i] = terms[i-1]+terms[i+1]
-            terms.pop(i+1),terms.pop(i-1)
-            i = 0
-        except:
-            pass
-        
-        try:
-            i = terms.index("-")
-            terms[i] = terms[i-1]-terms[i+1]
-            terms.pop(i+1),terms.pop(i-1)
-            i = 0
-        except:
-            pass
-
     return ''.join(str(term) for term in terms)
 
 #Logaritmus
@@ -128,7 +135,6 @@ def logarithm(base,arg,exp):
     
     else:
         return "Syntax error"
-
 
 #Ablak
 window = tk.Tk()
@@ -181,7 +187,7 @@ sq = tk.Button(window, text="√", font="Arial", command=lambda: main_panel.conf
 sq.grid(column=4,row=2,sticky="nw")
 bs = tk.Button(window, text="⌫", font="Arial", command=lambda: main_panel.config(text=main_panel.cget("text")[0:-1]))
 bs.grid(column=4,row=3,sticky="nw")
-eq = tk.Button(window, background="green", text="=", font="Arial", command=lambda: main_panel.config(text=Count(main_panel.cget("text"))))
+eq = tk.Button(window, background="green", text="=", font="Arial", command=lambda: main_panel.config(text=Get_Result(main_panel.cget("text"))))
 eq.grid(column=4,row=4,sticky="nw")
 ac = tk.Button(window,background="red" ,text="AC", font="Arial", command=lambda: main_panel.config(text=""))
 ac.grid(column=2,row=4,sticky="nw")
